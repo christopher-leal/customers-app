@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
+import { withRouter } from "react-router-dom";
 import CustomersActions from "./../components/CustomersActions";
 import AppFrame from "./../components/AppFrame";
 
 class HomeContainer extends Component {
   handleOnClick = () => {
-    console.log("hola");
+    this.props.history.push("/customers");
   };
   render() {
     return (
@@ -14,7 +14,6 @@ class HomeContainer extends Component {
           header="Home"
           body={
             <div>
-              Esta es la pantalla inicial
               <CustomersActions>
                 <button onClick={this.handleOnClick}>
                   Listado de clientes
@@ -28,6 +27,4 @@ class HomeContainer extends Component {
   }
 }
 
-HomeContainer.propTypes = {};
-
-export default HomeContainer;
+export default withRouter(HomeContainer);
