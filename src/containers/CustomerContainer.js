@@ -11,9 +11,6 @@ import { getCustomers } from "./../selectors/customers";
 class CustomerContainer extends Component {
   componentDidMount() {
     this.props.fetchCustomers();
-    fetch("https://my-json-server.typicode.com/user/repo/posts/1")
-      .then(response => response.json())
-      .then(json => console.log(json));
   }
 
   renderBody = customers => {
