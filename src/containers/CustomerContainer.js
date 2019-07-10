@@ -6,15 +6,14 @@ import AppFrame from "../components/AppFrame";
 import CustomerList from "./../components/CustomerList";
 import CustomersActions from "../components/CustomersActions";
 import { fetchCustomers } from "./../actions/fetchCustomers";
+import { getCustomers } from "./../selectors/customers";
 
-const customers = [
-  { dni: "2700000", name: "Juan Perez", age: 37 },
-  { dni: "3000000", name: "Otto", age: 17 },
-  { dni: "3330000", name: "Luis", age: 32 }
-];
 class CustomerContainer extends Component {
   componentDidMount() {
     this.props.fetchCustomers();
+    fetch("https://my-json-server.typicode.com/user/repo/posts/1")
+      .then(response => response.json())
+      .then(json => console.log(json));
   }
 
   renderBody = customers => {
@@ -35,7 +34,7 @@ class CustomerContainer extends Component {
       <div>
         <AppFrame
           header={"Listado de clientes"}
-          body={this.renderBody(customers)}
+          body={this.renderBody(this.props.customers)}
         />
       </div>
     );
@@ -43,15 +42,19 @@ class CustomerContainer extends Component {
 }
 
 CustomerContainer.propTypes = {
-  fetchCustomers: PropTypes.func.isRequired
+  fetchCustomers: PropTypes.func.isRequired,
+  customers: PropTypes.array.isRequired
 };
-
-const mapDispatchToProps = dispatch => ({
-  fetchCustomers: () => dispatch(fetchCustomers())
+CustomerContainer.defaultProps = {
+  customers: []
+};
+const mapStateToProps = state => ({
+  customers: getCustomers(state)
 });
+
 export default withRouter(
   connect(
-    null,
-    mapDispatchToProps
+    mapStateToProps,
+    { fetchCustomers }
   )(CustomerContainer)
 );
