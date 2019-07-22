@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomeContainer from "./containers/HomeContainer";
+import CustomersContainer from "./containers/CustomersContainer";
 import CustomerContainer from "./containers/CustomerContainer";
 
 function App() {
@@ -9,22 +10,23 @@ function App() {
       <HomeContainer />
     </div>
   );
-  const renderCustomerContainer = () => (
+  const renderCustomersContainer = () => (
     <div>
-      <CustomerContainer />
+      <CustomersContainer />
     </div>
   );
   const renderCustomerNewContainer = () => <div />;
   return (
     <Router>
       <div>
+        <Route exact path="/prueba" component={renderHome} />
         <Route exact path="/" component={renderHome} />
-        <Route exact path="/customers" component={renderCustomerContainer} />
+        <Route exact path="/customers" component={renderCustomersContainer} />
         <Switch>
           <Route path="/customers/new" component={renderCustomerNewContainer} />
           <Route
             path="/customers/:dni"
-            component={() => <h1>Customer dni</h1>}
+            render={props => <CustomerContainer dni={props.match.params.dni} />}
           />
         </Switch>
       </div>
