@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomeContainer from "./containers/HomeContainer";
 import CustomersContainer from "./containers/CustomersContainer";
 import CustomerContainer from "./containers/CustomerContainer";
+import NewCustomerContainer from "./containers/NewCustomerContainer";
 
 function App() {
   const renderHome = () => (
@@ -15,7 +16,6 @@ function App() {
       <CustomersContainer />
     </div>
   );
-  const renderCustomerNewContainer = () => <div />;
   return (
     <Router>
       <div>
@@ -23,7 +23,7 @@ function App() {
         <Route exact path="/" component={renderHome} />
         <Route exact path="/customers" component={renderCustomersContainer} />
         <Switch>
-          <Route path="/customers/new" component={renderCustomerNewContainer} />
+          <Route path="/customers/new" component={NewCustomerContainer} />
           <Route
             path="/customers/:dni"
             render={props => <CustomerContainer dni={props.match.params.dni} />}

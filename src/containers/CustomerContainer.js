@@ -8,6 +8,7 @@ import CustomerEdit from "./../components/CustomerEdit";
 import CustomerData from "./../components/CustomerData";
 import { fetchCustomers } from "./../actions/fetchCustomers";
 import { updateCustomer } from "./../actions/updateCustomer";
+import { deleteCustomer } from "./../actions/deleteCustomer";
 
 class CustomerContainer extends Component {
   componentDidMount() {
@@ -16,26 +17,47 @@ class CustomerContainer extends Component {
     }
   }
   handleSubmit = values => {
-    console.log(values);
     const { id } = values;
-    this.props.updateCustomer(id, values);
+    return this.props.updateCustomer(id, values);
   };
   handleOnBack = () => {
     this.props.history.goBack();
   };
+  handleOnSubmitSuccess = () => {
+    this.props.history.goBack();
+  };
+  handleOnDelete = id => {
+    this.props.deleteCustomer(id).then(v => {
+      this.props.history.goBack();
+    });
+  };
+  renderCustomerControl = (isEdit, isDelete) => {
+    if (this.props.customer) {
+      const CustomerControl = isEdit ? CustomerEdit : CustomerData;
+      return (
+        <CustomerControl
+          {...this.props.customer}
+          onSubmit={this.handleSubmit}
+          onSubmitSuccess={this.handleOnSubmitSuccess}
+          onBack={this.handleOnBack}
+          isDeleteAllow={!!isDelete}
+          onDelete={this.handleOnDelete}
+        />
+      );
+    }
+    return null;
+  };
   renderBody = () => (
     <Route
       path="/customers/:dni/edit"
-      children={({ match }) => {
-        const CustomerControl = match ? CustomerEdit : CustomerData;
-        return (
-          <CustomerControl
-            {...this.props.customer}
-            onSubmit={this.handleSubmit}
-            onBack={this.handleOnBack}
-          />
-        );
-      }}
+      children={({ match: isEdit }) => (
+        <Route
+          path="/customers/:dni/del"
+          children={({ match: isDelete }) =>
+            this.renderCustomerControl(isEdit, isDelete)
+          }
+        />
+      )}
     />
   );
   render() {
@@ -54,7 +76,8 @@ CustomerContainer.propTypes = {
   dni: PropTypes.string.isRequired,
   customer: PropTypes.object,
   fetchCustomers: PropTypes.func.isRequired,
-  updateCustomer: PropTypes.func.isRequired
+  updateCustomer: PropTypes.func.isRequired,
+  deleteCustomer: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state, props) => ({
@@ -64,6 +87,6 @@ const mapStateToProps = (state, props) => ({
 export default withRouter(
   connect(
     mapStateToProps,
-    { fetchCustomers, updateCustomer }
+    { fetchCustomers, updateCustomer, deleteCustomer }
   )(CustomerContainer)
 );
