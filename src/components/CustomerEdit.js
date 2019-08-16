@@ -1,8 +1,9 @@
-import React from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxForm, Field } from "redux-form";
 import { setPropsAsInitial } from "../helpers/setPropsAsInitial";
 import CustomersActions from "./CustomersActions";
+import { Prompt } from "react-router-dom";
 
 // const isRequired = value => !value && "Este campo es requerido";
 
@@ -20,43 +21,82 @@ const validate = values => {
   return error;
 };
 
-const MyField = ({ input, meta, type, label, name }) => (
-  <div>
-    <label htmlFor={name}>{label} </label>
-    <input {...input} type={!type ? "text" : type} />
-    {meta.touched && meta.error && <span>{meta.error}</span>}
-  </div>
-);
+const toUpper = value => value && value.toUpperCase();
+const toLower = value => value && value.toLowerCase();
+const toNumber = value => value && Number(value);
+const onlyGrow = (value, prev, values) =>
+  value && (!prev ? value : value > prev ? value : prev);
 
-const CustomerEdit = ({ name, dni, age, handleSubmit, submitting, onBack }) => {
-  return (
+class CustomerEdit extends Component {
+  componentDidMount() {
+    if (this.txt) {
+      this.txt.focus();
+    }
+  }
+  renderField = ({ input, meta, type, label, name, withFocus }) => (
     <div>
-      <h2>Edicion del cliente</h2>
-      <form onSubmit={handleSubmit}>
-        <Field name="name" component={MyField} label="Nombre:" />
-        <Field
-          name="dni"
-          component={MyField}
-          validate={[isNumber]}
-          label="DNI:"
-        />
-        <Field
-          name="age"
-          component={MyField}
-          type="number"
-          validate={[isNumber]}
-          label="Edad:"
-        />
-        <CustomersActions>
-          <button type="submit" disabled={submitting}>
-            Aceptar
-          </button>
-          <button onClick={onBack}>Cancelar</button>
-        </CustomersActions>
-      </form>
+      <label htmlFor={name}>{label} </label>
+      <input
+        {...input}
+        type={!type ? "text" : type}
+        ref={withFocus && (txt => (this.txt = txt))}
+      />
+      {meta.touched && meta.error && <span>{meta.error}</span>}
     </div>
   );
-};
+
+  render() {
+    const {
+      handleSubmit,
+      submitting,
+      onBack,
+      pristine,
+      submitSucceeded
+    } = this.props;
+    return (
+      <div>
+        <h2>Edicion del cliente</h2>
+        <form onSubmit={handleSubmit}>
+          <Field
+            withFocus
+            name="name"
+            component={this.renderField}
+            label="Nombre:"
+            parse={toUpper}
+            format={toLower}
+          />
+          <Field
+            name="dni"
+            component={this.renderField}
+            validate={[isNumber]}
+            label="DNI:"
+          />
+          <Field
+            name="age"
+            component={this.renderField}
+            type="number"
+            validate={[isNumber]}
+            label="Edad:"
+            parse={toNumber}
+            normalize={onlyGrow}
+          />
+          <CustomersActions>
+            <button type="submit" disabled={pristine || submitting}>
+              Aceptar
+            </button>
+            <button type="button" onClick={onBack} disabled={submitting}>
+              Cancelar
+            </button>
+          </CustomersActions>
+          <Prompt
+            when={!pristine && !submitSucceeded}
+            message="Se perderan los datos si continua"
+          />
+        </form>
+      </div>
+    );
+  }
+}
 
 CustomerEdit.propTypes = {
   name: PropTypes.string,
